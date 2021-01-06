@@ -8,8 +8,12 @@ router.get('/', rejectUnauthenticated, (req, res) => {
   console.log('req.user:', req.user);
   console.log('is authenticated?', req.isAuthenticated());
 
+  // storing clearance level of user chosen into variable
+  let clearance= req.user.clearance_level;
+  // storing query text into variable
+  let sqlText = `SELECT * FROM "secret" WHERE "secrecy_level" <= $1;`;
   pool
-    .query('SELECT * FROM "secret" WHERE "secrecy_level" < $13;', [req.user.id])
+    .query(sqlText, [clearance])
     .then((results) => res.send(results.rows))
     .catch((error) => {
       console.log('Error making SELECT for secrets:', error);
